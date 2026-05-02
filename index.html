@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>خدمات طوارئ للسيارات - العراق</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--primary:#0D1B2A;
+--secondary:#1B3A4B;
+--accent:#E63946;
+--accent2:#F4A261;
+--green:#22C55E;
+--white:#fff;
+}
+body{font-family:'Cairo',sans-serif;background:var(--primary);color:var(--white);overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+
+/* NAV */
+nav{position:fixed;top:0;width:100%;z-index:1000;background:rgba(13,27,42,.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(244,162,97,.15)}
+nav .container{max-width:1200px;margin:auto;display:flex;justify-content:space-between;align-items:center;padding:14px 24px}
+.logo{font-size:1.4rem;font-weight:900;color:var(--accent2)}
+.logo i{margin-left:8px;color:var(--accent)}
+.nav-links{display:flex;gap:28px;list-style:none;align-items:center}
+.nav-links a{font-weight:600;font-size:.9rem;transition:.3s}
+.nav-links a:hover{color:var(--accent2)}
+.nav-cta{background:linear-gradient(135deg,var(--accent),#c1121f);padding:9px 22px;border-radius:50px;font-weight:700;border:none;color:#fff;cursor:pointer;font-size:.9rem;font-family:'Cairo'}
+.nav-cta:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(230,57,70,.4)}
+.hamburger{display:none;font-size:1.4rem;cursor:pointer;color:var(--accent2)}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;position:relative;overflow:hidden;padding-top:70px}
+.hero-bg{position:absolute;inset:0;background:url('https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=1600') center/cover}
+.hero::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(13,27,42,.95) 55%,rgba(27,58,75,.8))}
+.hero .container{max-width:1200px;margin:auto;padding:80px 24px;position:relative;z-index:2;width:100%}
+
+.hero-top{display:flex;align-items:center;gap:8px;margin-bottom:28px}
+.available-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:#22C55E;padding:8px 18px;border-radius:50px;font-size:.85rem;font-weight:700}
+.available-pill .dot{width:8px;height:8px;background:#22C55E;border-radius:50%;animation:blink 1.5s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+
+.hero h1{font-size:3.4rem;font-weight:900;line-height:1.25;margin-bottom:18px;max-width:700px}
+.hero h1 span{color:var(--accent2)}
+.hero p{font-size:1.1rem;color:rgba(255,255,255,.75);max-width:580px;line-height:1.8;margin-bottom:36px}
+
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:56px}
+.btn-primary{background:linear-gradient(135deg,var(--accent),#c1121f);padding:14px 36px;border-radius:50px;font-weight:700;font-size:1rem;border:none;color:#fff;cursor:pointer;transition:.3s;font-family:'Cairo'}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(230,57,70,.4)}
+.btn-outline{background:transparent;border:2px solid var(--accent2);padding:14px 36px;border-radius:50px;font-weight:700;font-size:1rem;color:var(--accent2);cursor:pointer;transition:.3s;font-family:'Cairo'}
+.btn-outline:hover{background:var(--accent2);color:var(--primary)}
+
+/* HERO STATS */
+.hero-stats{display:flex;gap:0;border:1px solid rgba(244,162,97,.15);border-radius:20px;overflow:hidden;max-width:600px}
+.stat{flex:1;text-align:center;padding:22px 16px;background:rgba(255,255,255,.04);border-left:1px solid rgba(244,162,97,.1)}
+.stat:last-child{border-left:none}
+.stat h3{font-size:1.9rem;font-weight:900;color:var(--accent2)}
+.stat p{font-size:.8rem;color:rgba(255,255,255,.55);margin-top:4px}
+
+/* RATING STRIP */
+.rating-strip{margin-top:24px;display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.6);font-size:.9rem}
+.rating-strip .stars{color:#F4A261;font-size:1rem}
+
+/* SERVICES */
+.section{padding:90px 24px}
+.section.alt{background:var(--secondary)}
+.container{max-width:1200px;margin:auto}
+.section-head{text-align:center;margin-bottom:50px}
+.section-head .tag{display:inline-block;background:rgba(244,162,97,.12);color:var(--accent2);padding:6px 18px;border-radius:50px;font-size:.8rem;font-weight:700;margin-bottom:14px}
+.section-head h2{font-size:2.2rem;font-weight:900;margin-bottom:10px}
+.section-head p{color:rgba(255,255,255,.55);font-size:1rem}
+
+.services-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.svc-card{background:rgba(255,255,255,.03);border:1px solid rgba(244,162,97,.08);border-radius:18px;padding:30px;transition:.35s}
+.svc-card:hover{transform:translateY(-6px);border-color:rgba(244,162,97,.25);background:rgba(255,255,255,.05)}
+.svc-card .ic{width:56px;height:56px;background:rgba(244,162,97,.12);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:var(--accent2);margin-bottom:16px}
+.svc-card h3{font-size:1.05rem;font-weight:700;margin-bottom:8px}
+.svc-card p{color:rgba(255,255,255,.55);font-size:.85rem;line-height:1.7}
+
+/* WHY */
+.why-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.why-card{text-align:center;padding:28px 16px;border-radius:18px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05);transition:.3s}
+.why-card:hover{background:rgba(244,162,97,.07);border-color:rgba(244,162,97,.18)}
+.why-card .em{font-size:2.2rem;margin-bottom:8px}
+.why-card h4{font-size:.95rem;font-weight:700;margin-bottom:6px}
+.why-card p{font-size:.8rem;color:rgba(255,255,255,.45);line-height:1.6}
+
+/* CAR IMAGE SECTION */
+.car-showcase{padding:70px 24px;background:linear-gradient(135deg,var(--primary),var(--secondary))}
+.car-showcase .container{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center;max-width:1200px;margin:auto}
+.car-showcase img{width:100%;border-radius:20px;border:1px solid rgba(244,162,97,.15)}
+.showcase-text h2{font-size:2rem;font-weight:900;margin-bottom:16px}
+.showcase-text h2 span{color:var(--accent2)}
+.showcase-text p{color:rgba(255,255,255,.65);line-height:1.8;margin-bottom:24px}
+.features-list{list-style:none;display:flex;flex-direction:column;gap:12px}
+.features-list li{display:flex;align-items:center;gap:10px;font-size:.92rem}
+.features-list li i{color:var(--accent2);font-size:.75rem}
+
+/* CONTACT */
+.contact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.con-card{background:rgba(255,255,255,.04);border:1px solid rgba(244,162,97,.08);border-radius:18px;padding:30px;text-align:center;transition:.3s}
+.con-card:hover{transform:translateY(-4px);border-color:rgba(244,162,97,.2)}
+.con-card .ic{width:54px;height:54px;background:linear-gradient(135deg,var(--accent2),var(--accent));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#fff;margin:0 auto 16px}
+.con-card h4{font-size:1rem;font-weight:700;margin-bottom:8px}
+.con-card p{color:rgba(255,255,255,.55);font-size:.9rem;line-height:1.6}
+.con-card a{color:var(--accent2);font-weight:600;transition:.3s}
+.con-card a:hover{color:var(--accent)}
+
+/* FOOTER */
+footer{background:rgba(0,0,0,.25);border-top:1px solid rgba(244,162,97,.08);padding:32px 24px}
+footer .container{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;max-width:1200px;margin:auto}
+footer p{color:rgba(255,255,255,.4);font-size:.85rem}
+.social-links{display:flex;gap:10px}
+.social-links a{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;transition:.3s;font-size:.85rem}
+.social-links a:hover{background:var(--accent2);color:var(--primary)}
+
+/* FLOAT BUTTONS */
+.whatsapp-float{position:fixed;bottom:24px;right:24px;width:54px;height:54px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.5rem;color:#fff;z-index:999;transition:.3s;box-shadow:0 4px 14px rgba(37,211,102,.4)}
+.whatsapp-float:hover{transform:scale(1.1)}
+.scroll-top{position:fixed;bottom:24px;left:24px;width:46px;height:46px;background:linear-gradient(135deg,var(--accent2),var(--accent));border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;opacity:0;transition:.3s;z-index:999;border:none;color:#fff;font-size:1rem}
+.scroll-top.show{opacity:1}
+
+/* FADE */
+.fade-up{opacity:0;transform:translateY(24px);transition:.5s ease}
+.fade-up.visible{opacity:1;transform:translateY(0)}
+
+/* ORDER OVERLAY */
+.overlay{display:none;position:fixed;inset:0;z-index:2000;background:var(--primary);overflow-y:auto}
+.overlay.active{display:block}
+.order-bar{position:sticky;top:0;z-index:50;background:rgba(13,27,42,.97);backdrop-filter:blur(8px);border-bottom:1px solid rgba(244,162,97,.18);padding:12px 20px;display:flex;align-items:center;gap:12px}
+.order-bar h2{font-weight:700;font-size:1rem}
+.back-btn{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);color:#fff;padding:6px 14px;border-radius:10px;cursor:pointer;font-family:'Cairo';font-size:.85rem;transition:.3s}
+.back-btn:hover{background:rgba(244,162,97,.18)}
+.order-body{padding:20px;max-width:600px;margin:0 auto;display:flex;flex-direction:column;gap:14px;padding-bottom:40px}
+
+#map{width:100%;height:48vh;border-radius:14px;border:1px solid rgba(244,162,97,.18)}
+@media(min-width:768px){#map{height:52vh}}
+.map-hint{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:1000;background:var(--accent);color:#fff;padding:5px 14px;border-radius:50px;font-size:.75rem;font-weight:600;box-shadow:0 3px 10px rgba(0,0,0,.3)}
+
+.search-group{display:flex;flex-direction:column;gap:6px}
+.search-row{display:flex;gap:8px}
+.s-wrap{position:relative;flex:1}
+.s-wrap input{width:100%;padding:10px 38px 10px 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:12px;color:#fff;font-family:'Cairo';font-size:.88rem;outline:none;transition:.3s}
+.s-wrap input:focus{border-color:var(--accent2);box-shadow:0 0 0 2px rgba(244,162,97,.12)}
+.s-wrap .si{position:absolute;right:11px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.35);font-size:.8rem}
+.s-drop{position:absolute;top:100%;left:0;right:0;z-index:50;margin-top:3px;background:var(--secondary);border:1px solid rgba(244,162,97,.18);border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.35);max-height:190px;overflow-y:auto;display:none}
+.s-drop.show{display:block}
+.s-drop button{width:100%;display:flex;align-items:flex-start;gap:7px;padding:9px 12px;background:none;border:none;color:#ccc;font-family:'Cairo';font-size:.78rem;text-align:right;cursor:pointer;line-height:1.4}
+.s-drop button:hover{background:rgba(244,162,97,.08)}
+.map-btn{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;border:none;padding:10px 14px;border-radius:12px;font-size:.82rem;font-weight:600;cursor:pointer;font-family:'Cairo';white-space:nowrap}
+
+.probs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.prob-btn{display:flex;align-items:center;gap:8px;padding:11px;border-radius:11px;border:2px solid rgba(255,255,255,.09);background:rgba(255,255,255,.02);color:#ccc;font-family:'Cairo';font-size:.82rem;font-weight:600;cursor:pointer;transition:.3s}
+.prob-btn:hover{border-color:rgba(244,162,97,.25)}
+.prob-btn.active{border-color:var(--accent2);background:rgba(244,162,97,.1);color:var(--accent2)}
+
+.driver-card{background:rgba(34,197,94,.07);border:1px solid rgba(34,197,94,.22);border-radius:12px;padding:12px;display:flex;align-items:center;gap:12px}
+.driver-card .info{flex:1}
+.driver-card .info .name{font-weight:700;font-size:.88rem}
+.driver-card .info .dist{font-size:.72rem;color:rgba(255,255,255,.45)}
+.driver-card .eta .val{font-size:1.15rem;font-weight:700;color:var(--green);text-align:center}
+.driver-card .eta .lbl{font-size:.62rem;color:rgba(255,255,255,.4)}
+
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.metric{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:12px;padding:11px;text-align:center}
+.metric .lbl{font-size:.68rem;color:rgba(255,255,255,.45)}
+.metric .val{font-size:1.05rem;font-weight:700}
+
+.field label{font-size:.82rem;font-weight:600;display:block;margin-bottom:5px}
+.field input{width:100%;padding:10px 38px 10px 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09);border-radius:12px;color:#fff;font-family:'Cairo';font-size:.88rem;outline:none;transition:.3s}
+.field input:focus{border-color:var(--accent2)}
+.field .fi{position:absolute;right:11px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.35)}
+
+.submit-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent),#c1121f);color:#fff;border:none;border-radius:50px;font-size:1.05rem;font-weight:700;cursor:pointer;font-family:'Cairo';transition:.3s}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(230,57,70,.4)}
+.submit-btn:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* CONFIRMED */
+.confirmed-ov{display:none;position:fixed;inset:0;z-index:3000;background:var(--primary);flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;gap:1.2rem;overflow-y:auto}
+.confirmed-ov.active{display:flex}
+.check-circle{width:76px;height:76px;border-radius:50%;background:rgba(34,197,94,.12);display:flex;align-items:center;justify-content:center;font-size:2.4rem;animation:popIn .45s ease}
+@keyframes popIn{0%{transform:scale(0)}60%{transform:scale(1.15)}100%{transform:scale(1)}}
+.confirmed-ov h2{font-size:1.4rem;font-weight:800}
+.detail-box{background:rgba(255,255,255,.04);border:1px solid rgba(244,162,97,.12);border-radius:16px;padding:18px;width:100%;max-width:400px;text-align:right}
+.detail-box .row{display:flex;justify-content:space-between;padding:5px 0;font-size:.82rem}
+.detail-box .row .lbl{color:rgba(255,255,255,.45)}
+.detail-box .row .val{font-weight:700}
+
+/* CANCEL BTN */
+.cancel-btn{background:transparent;border:2px solid rgba(230,57,70,.5);color:rgba(230,57,70,.9);padding:10px 28px;border-radius:50px;font-weight:700;font-size:.92rem;cursor:pointer;font-family:'Cairo';transition:.3s;margin-top:4px}
+.cancel-btn:hover{background:rgba(230,57,70,.1);border-color:var(--accent)}
+
+/* CANCEL MODAL */
+.cancel-modal{display:none;position:fixed;inset:0;z-index:4000;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:20px}
+.cancel-modal.active{display:flex}
+.cancel-box{background:var(--secondary);border:1px solid rgba(244,162,97,.2);border-radius:20px;padding:28px;width:100%;max-width:440px;text-align:center}
+.cancel-box h3{font-size:1.2rem;font-weight:800;margin-bottom:6px;color:var(--accent)}
+.cancel-box p{color:rgba(255,255,255,.55);font-size:.88rem;margin-bottom:18px}
+.cancel-box textarea{width:100%;padding:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;color:#fff;font-family:'Cairo';font-size:.88rem;resize:none;height:110px;outline:none;transition:.3s;direction:rtl}
+.cancel-box textarea:focus{border-color:var(--accent2)}
+.cancel-box .modal-btns{display:flex;gap:10px;margin-top:14px}
+.modal-btns button{flex:1;padding:11px;border-radius:50px;font-weight:700;font-size:.9rem;cursor:pointer;font-family:'Cairo';transition:.3s;border:none}
+.modal-btns .confirm-cancel{background:linear-gradient(135deg,var(--accent),#c1121f);color:#fff}
+.modal-btns .confirm-cancel:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(230,57,70,.35)}
+.modal-btns .go-back{background:rgba(255,255,255,.07);color:#ccc;border:1px solid rgba(255,255,255,.1)!important}
+.modal-btns .go-back:hover{background:rgba(255,255,255,.12)}
+
+/* CANCELLED STATE */
+.cancelled-ov{display:none;position:fixed;inset:0;z-index:3000;background:var(--primary);flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;gap:1.2rem}
+.cancelled-ov.active{display:flex}
+.x-circle{width:76px;height:76px;border-radius:50%;background:rgba(230,57,70,.12);display:flex;align-items:center;justify-content:center;font-size:2.4rem;animation:popIn .45s ease}
+
+/* RATING */
+#ratingStars span{font-size:1.7rem;cursor:pointer;transition:.2s}
+#ratingStars span:hover{transform:scale(1.2)}
+
+/* RESPONSIVE */
+@media(max-width:968px){
+.hero h1{font-size:2.2rem}
+.services-grid{grid-template-columns:1fr 1fr}
+.why-grid{grid-template-columns:1fr 1fr}
+.contact-grid{grid-template-columns:1fr}
+.car-showcase .container{grid-template-columns:1fr}
+.car-showcase img{max-height:280px;object-fit:cover}
+.nav-links{display:none;position:absolute;top:100%;right:0;left:0;background:rgba(13,27,42,.99);flex-direction:column;padding:20px;gap:16px}
+.nav-links.active{display:flex}
+.hamburger{display:block}
+.hero-stats{max-width:100%}
+}
+@media(max-width:600px){
+.hero h1{font-size:1.75rem}
+.services-grid{grid-template-columns:1fr}
+.why-grid{grid-template-columns:1fr 1fr}
+.hero-stats{flex-direction:column}
+.stat{border-left:none;border-top:1px solid rgba(244,162,97,.1)}
+.probs{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+<div class="container">
+<a href="#" class="logo"><i class="fas fa-truck-moving"></i> طوارئ السيارات في العراق</a>
+<ul class="nav-links" id="navLinks">
+<li><a href="#hero">الرئيسية</a></li>
+<li><a href="#services">خدماتنا</a></li>
+<li><a href="#why">لماذا نحن</a></li>
+<li><a href="#contact">اتصل بنا</a></li>
+</ul>
+<button class="nav-cta" onclick="openOrder()"><i class="fas fa-bolt"></i> ابدأ الطلب</button>
+<div class="hamburger" onclick="document.getElementById('navLinks').classList.toggle('active')"><i class="fas fa-bars"></i></div>
+</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+<div class="hero-bg"></div>
+<div class="container">
+  <div class="hero-top">
+    <div class="available-pill"><span class="dot"></span><i class="fas fa-check-circle"></i> متاحون الآن في جميع المحافظات</div>
+  </div>
+  <h1>خدمة طوارئ <span>سيارات فورية</span> في العراق</h1>
+  <p>سحب ونقل السيارات، تبديل البطاريات والإطارات، وفتح الأقفال. نصلك أينما كنت خلال دقائق مع فريق محترف يعمل على مدار الساعة.</p>
+  <div class="hero-btns">
+    <button class="btn-primary" onclick="openOrder()"><i class="fas fa-bolt"></i> ابدأ الطلب الآن</button>
+    <a href="#services" class="btn-outline"><i class="fas fa-th-large"></i> خدماتنا</a>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><h3>50+</h3><p>سائق متوفر</p></div>
+    <div class="stat"><h3>8 د</h3><p>متوسط الوصول</p></div>
+    <div class="stat"><h3>24/7</h3><p>خدمة مستمرة</p></div>
+  </div>
+  <div class="rating-strip">
+    <span class="stars">★★★★★</span>
+    <span>تقييم 4.9 من 5 — بناءً على آلاف الطلبات</span>
+  </div>
+</div>
+</section>
+
+<!-- CAR SHOWCASE -->
+<div class="car-showcase">
+<div class="container">
+  <img src="https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?w=700&auto=format&fit=crop&q=80" alt="خدمة طوارئ السيارات">
+  <div class="showcase-text">
+    <h2>🚛 طوارئ سيارات <span>سريعة واحترافية</span></h2>
+    <p>فريقنا جاهز على مدار الساعة للوصول إليك في أسرع وقت ممكن، مع أحدث معدات السحب والنقل في جميع محافظات العراق.</p>
+    <ul class="features-list">
+      <li><i class="fas fa-check"></i> سحب ونقل احترافي بأحدث السطحات</li>
+      <li><i class="fas fa-check"></i> تبديل بطاريات وإطارات في الموقع</li>
+      <li><i class="fas fa-check"></i> فتح أقفال بدون أي ضرر للسيارة</li>
+      <li><i class="fas fa-check"></i> أسعار شفافة بالدينار العراقي</li>
+      <li><i class="fas fa-check"></i> تغطية شاملة لجميع المحافظات</li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<!-- SERVICES -->
+<section class="section" id="services">
+<div class="container">
+  <div class="section-head fade-up">
+    <span class="tag">خدماتنا</span>
+    <h2>خدمات متكاملة لسيارتك</h2>
+    <p>نوفر لك كل ما تحتاجه في حالات الطوارئ</p>
+  </div>
+  <div class="services-grid">
+    <div class="svc-card fade-up"><div class="ic"><i class="fas fa-truck-moving"></i></div><h3>سحب ونقل السيارات</h3><p>نقل سيارتك بأمان إلى أي وجهة باستخدام سطحات حديثة بأعلى معايير السلامة.</p></div>
+    <div class="svc-card fade-up"><div class="ic"><i class="fas fa-car-battery"></i></div><h3>شحن وتبديل البطاريات</h3><p>خدمة فورية لشحن أو تبديل بطارية سيارتك في موقعك مباشرة.</p></div>
+    <div class="svc-card fade-up"><div class="ic"><i class="fas fa-circle-notch"></i></div><h3>تبديل الإطارات</h3><p>تبديل إطارات سيارتك في مكانك مع توفير إطارات بديلة عند الحاجة.</p></div>
+    <div class="svc-card fade-up"><div class="ic"><i class="fas fa-key"></i></div><h3>فتح الأقفال</h3><p>فتح أقفال السيارات المغلقة بتقنيات آمنة دون أي ضرر للسيارة.</p></div>
+    <div class="svc-card fade-up"><div class="ic"><i class="fas fa-gas-pump"></i></div><h3>توصيل الوقود</h3><p>نصلك بالوقود أينما كنت. لا داعي للقلق إذا نفد وقود سيارتك.</p></div>
+    <div class="svc-card fade-up"><div class="ic"><i class="fas fa-wrench"></i></div><h3>إصلاح في الموقع</h3><p>فنيون متخصصون لإصلاح الأعطال البسيطة في موقعك مباشرة.</p></div>
+  </div>
+</div>
+</section>
+
+<!-- WHY US -->
+<section class="section alt" id="why">
+<div class="container">
+  <div class="section-head fade-up">
+    <span class="tag">لماذا نحن</span>
+    <h2>ما يميزنا عن غيرنا</h2>
+    <p>خبرة واحترافية تجعلنا الخيار الأول في العراق</p>
+  </div>
+  <div class="why-grid">
+    <div class="why-card fade-up"><div class="em">⚡</div><h4>سرعة الاستجابة</h4><p>نصلك خلال 15 دقيقة أو أقل في معظم المناطق</p></div>
+    <div class="why-card fade-up"><div class="em">🛡️</div><h4>فريق محترف</h4><p>فنيون معتمدون ومدربون على أعلى مستوى</p></div>
+    <div class="why-card fade-up"><div class="em">💰</div><h4>أسعار شفافة</h4><p>لا رسوم مخفية — تعرف على السعر قبل الخدمة</p></div>
+    <div class="why-card fade-up"><div class="em">🕐</div><h4>متاحون 24/7</h4><p>نخدمك على مدار الساعة طوال أيام الأسبوع</p></div>
+  </div>
+</div>
+</section>
+
+<!-- CONTACT -->
+<section class="section" id="contact">
+<div class="container">
+  <div class="section-head fade-up">
+    <span class="tag">تواصل معنا</span>
+    <h2>نحن هنا لمساعدتك</h2>
+    <p>تواصل معنا بأي طريقة تناسبك</p>
+  </div>
+  <div class="contact-grid">
+    <div class="con-card fade-up"><div class="ic"><i class="fas fa-phone-alt"></i></div><h4>اتصل بنا</h4><p><a href="tel:+9647801234567">0780 123 4567</a></p><p><a href="tel:+9647901234568">0790 123 4568</a></p></div>
+    <div class="con-card fade-up"><div class="ic"><i class="fab fa-whatsapp"></i></div><h4>واتساب</h4><p><a href="https://wa.me/9647801234567">راسلنا على الواتساب</a></p><p>رد فوري على مدار الساعة</p></div>
+    <div class="con-card fade-up"><div class="ic"><i class="fas fa-map-marker-alt"></i></div><h4>التغطية</h4><p>جمهورية العراق</p><p>جميع المحافظات الـ 18</p></div>
+  </div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+<div class="container">
+<p>©  خدمات طوارئ للسيارات في العراق </p>
+<div class="social-links">
+  <a href="#"><i class="fab fa-facebook"></i></a>
+  <a href="#"><i class="fab fa-instagram"></i></a>
+  <a href="#"><i class="fab fa-twitter"></i></a>
+  <a href="#"><i class="fab fa-tiktok"></i></a>
+</div>
+</div>
+</footer>
+
+<a href="https://wa.me/9647801234567" class="whatsapp-float" target="_blank"><i class="fab fa-whatsapp"></i></a>
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fas fa-chevron-up"></i></button>
+
+<!-- ===== ORDER OVERLAY ===== -->
+<div class="overlay" id="orderOverlay">
+<div class="order-bar">
+  <button class="back-btn" onclick="closeOrder()"><i class="fas fa-arrow-right"></i> رجوع</button>
+  <span>🚛</span>
+  <h2>ابدأ الطلب</h2>
+</div>
+<div class="order-body">
+  <div id="map"></div>
+  <div class="search-group">
+    <label style="font-size:.82rem;font-weight:700">📍 موقع السيارة</label>
+    <div class="search-row">
+      <div class="s-wrap" id="carWrap">
+        <span class="si"><i class="fas fa-search"></i></span>
+        <input id="carInput" onfocus="showDrop('car')" oninput="debounce(this.value,'car')" placeholder="ابحث عن موقعك...">
+        <div class="s-drop" id="carDrop"></div>
+      </div>
+      <button class="map-btn" onclick="toggleMode('car')">📍 الخريطة</button>
+    </div>
+  </div>
+  <div>
+    <label style="font-size:.82rem;font-weight:700;display:block;margin-bottom:7px">🔧 نوع الخدمة</label>
+    <div class="probs">
+      <button class="prob-btn" onclick="pickService(this,'tow')">🚛 نقل السيارة</button>
+      <button class="prob-btn" onclick="pickService(this,'repair')">🔧 تصليح بالموقع</button>
+      <button class="prob-btn" onclick="pickService(this,'battery')">🔋 شحن بطارية</button>
+      <button class="prob-btn" onclick="pickService(this,'tire')">🛞 تبديل إطارات</button>
+    </div>
+  </div>
+  <div class="search-group" id="destGroup" style="display:none">
+    <label style="font-size:.82rem;font-weight:700">🧭 الوجهة</label>
+    <div class="search-row">
+      <div class="s-wrap" id="destWrap">
+        <span class="si"><i class="fas fa-search"></i></span>
+        <input id="destInput" onfocus="showDrop('dest')" oninput="debounce(this.value,'dest')" placeholder="ابحث عن الوجهة...">
+        <div class="s-drop" id="destDrop"></div>
+      </div>
+      <button class="map-btn" onclick="toggleMode('dest')">🧭 الخريطة</button>
+    </div>
+  </div>
+  <div id="driverInfo" style="display:none"></div>
+  <div id="metricsPanel" style="display:none"></div>
+  <div class="field"><label>🚗 نوع السيارة</label><div style="position:relative"><span class="fi">🚗</span><input id="carTypeInput" placeholder="مثال: تويوتا كامري 2022"></div></div>
+  <div class="field"><label>📱 رقم الهاتف</label><div style="position:relative"><span class="fi">📱</span><input id="phoneInput" placeholder="07XXXXXXXX" type="tel"></div></div>
+  <div style="font-size:.72rem;color:rgba(255,255,255,.35);line-height:1.7">سيتم محاولة الإصلاح في موقعك أولاً، وإذا تعذر ذلك سيتم النقل للوجهة المحددة.</div>
+  <button class="submit-btn" disabled id="submitBtn" onclick="confirmOrder()"><i class="fas fa-check-circle"></i> تأكيد الطلب</button>
+</div>
+</div>
+
+<!-- ===== CONFIRMED OVERLAY ===== -->
+<div class="confirmed-ov" id="confirmedOv">
+<div class="check-circle">✅</div>
+<h2>تم قبول طلبك!</h2>
+<p style="color:rgba(255,255,255,.45)">السائق في الطريق إليك</p>
+<div class="detail-box" id="confirmDetail"></div>
+<div>
+  <div style="font-weight:700;margin-bottom:8px">قيّم الخدمة</div>
+  <div id="ratingStars">
+    <span onclick="rate(1)">⭐</span><span onclick="rate(2)">⭐</span><span onclick="rate(3)">⭐</span><span onclick="rate(4)">⭐</span><span onclick="rate(5)">⭐</span>
+  </div>
+  <div id="ratingTxt" style="font-size:.78rem;color:rgba(255,255,255,.35);margin-top:4px"></div>
+</div>
+<button class="cancel-btn" onclick="openCancelModal()"><i class="fas fa-times-circle"></i> إلغاء الطلب</button>
+<button class="btn-primary" onclick="closeOrder()" style="margin-top:4px"><i class="fas fa-plus-circle"></i> طلب جديد</button>
+</div>
+
+<!-- ===== CANCELLED OVERLAY ===== -->
+<div class="cancelled-ov" id="cancelledOv">
+<div class="x-circle">❌</div>
+<h2>تم إلغاء الطلب</h2>
+<p id="cancelReasonShow" style="color:rgba(255,255,255,.5);font-size:.9rem;max-width:360px"></p>
+<p style="font-size:.8rem;color:rgba(255,255,255,.3);margin-top:-8px">تم إرسال إشعار الإلغاء</p>
+<button class="btn-primary" onclick="closeOrder()" style="margin-top:12px"><i class="fas fa-plus-circle"></i> طلب جديد</button>
+</div>
+
+<!-- ===== CANCEL MODAL ===== -->
+<div class="cancel-modal" id="cancelModal">
+<div class="cancel-box">
+  <h3><i class="fas fa-times-circle"></i> إلغاء الطلب</h3>
+  <p>يرجى ذكر سبب الإلغاء حتى نتمكن من تحسين خدمتنا</p>
+  <textarea id="cancelReason" placeholder="اكتب سبب الإلغاء هنا..."></textarea>
+  <div class="modal-btns">
+    <button class="go-back" onclick="closeCancelModal()">رجوع</button>
+    <button class="confirm-cancel" onclick="submitCancel()">تأكيد الإلغاء</button>
+  </div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+// =========================================
+// إعداد إشعارات البريد الإلكتروني (Formsubmit)
+// يتم الإرسال لـ yassinsinma0@gmail.com
+// =========================================
+const ADMIN_EMAIL = 'yassinsinma0@gmail.com';
+
+async function sendEmailNotification(subject, bodyLines){
+  const message = bodyLines.join('\n');
+  try {
+    await fetch('https://formsubmit.co/ajax/' + ADMIN_EMAIL, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','Accept':'application/json'},
+      body: JSON.stringify({
+        _subject: subject,
+        message: message,
+        _captcha: 'false',
+        _template: 'table'
+      })
+    });
+  } catch(e){ console.log('Email error:', e); }
+}
+
+// =========================================
+// Scroll + Nav + Fade
+// =========================================
+window.addEventListener('scroll',()=>{
+  document.getElementById('scrollTop').classList.toggle('show',window.scrollY>400)
+});
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t)t.scrollIntoView({behavior:'smooth'});
+    document.getElementById('navLinks').classList.remove('active');
+  })
+});
+const obsv=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:.12});
+document.querySelectorAll('.fade-up').forEach(el=>obsv.observe(el));
+
+// =========================================
+// ORDER SYSTEM
+// =========================================
+let map, carMark, destMark, routeLine, mode=null, carLoc=null, destLoc=null, svc='';
+let driverMarkers={}, craneMarkers={};
+let timers={car:null,dest:null};
+let currentOrder = {};
+
+const DRIVERS=[
+{id:"d1",name:"أحمد الجبوري",phone:"07801234567",plate:"بغداد أ 1234",rating:4.8,pos:[33.33,44.40],speed:40},
+{id:"d2",name:"خالد العبيدي",phone:"07901234568",plate:"بغداد ب 5678",rating:4.5,pos:[33.30,44.35],speed:35},
+{id:"d3",name:"محمد الشمري",phone:"07801234569",plate:"بغداد ج 9012",rating:4.9,pos:[33.38,44.43],speed:45},
+{id:"d4",name:"فاضل الدليمي",phone:"07701234570",plate:"البصرة د 3456",rating:4.3,pos:[30.50,47.82],speed:38},
+{id:"d5",name:"عبدالله الموسوي",phone:"07801234571",plate:"البصرة هـ 7890",rating:4.7,pos:[30.53,47.79],speed:42},
+{id:"d6",name:"حسين الأسدي",phone:"07901234572",plate:"النجف و 1357",rating:4.6,pos:[32.00,44.34],speed:36},
+{id:"d7",name:"ناصر العزاوي",phone:"07801234573",plate:"كربلاء ز 2468",rating:4.4,pos:[32.61,44.03],speed:37},
+{id:"d8",name:"طارق الربيعي",phone:"07701234574",plate:"الموصل ح 3579",rating:4.7,pos:[36.34,43.13],speed:43}
+];
+
+const CRANES=[
+{id:"c1",pos:[33.34,44.40]},{id:"c2",pos:[33.30,44.38]},{id:"c3",pos:[33.37,44.43]},
+{id:"c4",pos:[33.31,44.33]},{id:"c5",pos:[33.39,44.47]},{id:"c6",pos:[33.28,44.42]},{id:"c7",pos:[33.35,44.36]},
+{id:"c8",pos:[30.50,47.82]},{id:"c9",pos:[30.53,47.79]},{id:"c10",pos:[30.47,47.85]},
+{id:"c11",pos:[36.34,43.13]},{id:"c12",pos:[36.37,43.10]},{id:"c13",pos:[36.31,43.16]},
+{id:"c14",pos:[36.19,44.01]},{id:"c15",pos:[36.22,44.04]},{id:"c16",pos:[36.16,43.98]},
+{id:"c17",pos:[32.00,44.34]},{id:"c18",pos:[32.03,44.31]},{id:"c19",pos:[31.97,44.37]},
+{id:"c20",pos:[32.61,44.03]},{id:"c21",pos:[32.64,44.06]},{id:"c22",pos:[32.58,44.00]},
+{id:"c23",pos:[33.42,43.30]},{id:"c24",pos:[33.45,43.33]},{id:"c25",pos:[33.39,43.27]},
+{id:"c26",pos:[34.60,43.68]},{id:"c27",pos:[34.63,43.71]},{id:"c28",pos:[34.57,43.65]},
+{id:"c29",pos:[33.74,44.66]},{id:"c30",pos:[33.77,44.69]},{id:"c31",pos:[33.71,44.63]},
+{id:"c32",pos:[31.05,46.26]},{id:"c33",pos:[31.08,46.29]},{id:"c34",pos:[31.02,46.23]},
+{id:"c35",pos:[31.84,47.15]},{id:"c36",pos:[31.87,47.18]},{id:"c37",pos:[31.81,47.12]},
+{id:"c38",pos:[32.50,45.83]},{id:"c39",pos:[32.53,45.86]},{id:"c40",pos:[32.47,45.80]},
+{id:"c41",pos:[32.49,44.42]},{id:"c42",pos:[32.52,44.45]},{id:"c43",pos:[32.46,44.39]},
+{id:"c44",pos:[31.99,44.92]},{id:"c45",pos:[32.02,44.95]},{id:"c46",pos:[31.96,44.89]},
+{id:"c47",pos:[31.32,45.28]},{id:"c48",pos:[31.35,45.31]},{id:"c49",pos:[31.29,45.25]},
+{id:"c50",pos:[35.56,45.44]},{id:"c51",pos:[35.59,45.47]},{id:"c52",pos:[35.53,45.41]},
+{id:"c53",pos:[36.87,42.99]},{id:"c54",pos:[36.90,43.02]},{id:"c55",pos:[36.84,42.96]},
+{id:"c56",pos:[35.47,44.39]},{id:"c57",pos:[35.50,44.42]},{id:"c58",pos:[35.44,44.36]}
+];
+
+function haversine(a,b){const R=6371,dLat=(b[0]-a[0])*Math.PI/180,dLon=(b[1]-a[1])*Math.PI/180,la=a[0]*Math.PI/180,lb=b[0]*Math.PI/180,x=Math.sin(dLat/2)**2+Math.cos(la)*Math.cos(lb)*Math.sin(dLon/2)**2;return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))}
+function price(d){if(svc==='battery')return 25000;if(svc==='tire')return 20000;if(svc==='repair')return 35000;if(svc==='tow')return 40000+Math.round(d)*2500;return 35000+Math.round(d)*2500}
+function fmtPrice(p){return p.toLocaleString('ar-IQ')+' د.ع'}
+function eta(d,s){return Math.max(2,Math.round(d/s*60))}
+function nearest(pos){let n=DRIVERS[0],m=Infinity;DRIVERS.forEach(d=>{const r=haversine(pos,d.pos);if(r<m){m=r;n=d}});return{driver:n,dist:m}}
+
+function craneIc(hi){const bg=hi?'#22C55E':'#F4A261',s=hi?40:32;return L.divIcon({html:'<div style="background:'+bg+';border-radius:50%;width:'+s+'px;height:'+s+'px;display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3);font-size:'+(hi?18:14)+'px;'+(hi?'animation:pulse2 1.5s infinite':'')+'">🚛</div>',className:'',iconSize:[s,s],iconAnchor:[s/2,s/2]})}
+const carIc=L.divIcon({html:'<div style="background:#3B82F6;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3);font-size:15px">📍</div>',className:'',iconSize:[32,32],iconAnchor:[16,16]});
+const pinIc=L.divIcon({html:'<div style="background:#E63946;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.3);font-size:15px">🏁</div>',className:'',iconSize:[32,32],iconAnchor:[16,16]});
+
+function initMap(){
+  map=L.map('map').setView([33.0,44.0],6);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(map);
+  map.on('click',e=>{
+    if(mode==='car'){setCarLoc([e.latlng.lat,e.latlng.lng]);mode='dest';updateHint()}
+    else if(mode==='dest'){setDestLoc([e.latlng.lat,e.latlng.lng]);mode=null;updateHint()}
+  });
+  CRANES.forEach(c=>{craneMarkers[c.id]=L.marker(c.pos,{icon:craneIc(false)}).addTo(map).bindPopup('🚛 كرين متاح')});
+  DRIVERS.forEach(d=>{driverMarkers[d.id]=L.marker(d.pos,{icon:craneIc(false)}).addTo(map).bindPopup('🚛 '+d.name+'<br>⭐ '+d.rating)});
+  if(navigator.geolocation){navigator.geolocation.getCurrentPosition(p=>{const l=[p.coords.latitude,p.coords.longitude];map.setView(l,13);setCarLoc(l)},()=>{},{enableHighAccuracy:true})}
+  setInterval(moveTrucks,2000);
+}
+
+function moveTrucks(){
+  DRIVERS.forEach(d=>{const a=Math.random()*2*Math.PI,r=.0003+Math.random()*.0005;d.pos=[d.pos[0]+Math.cos(a)*r,d.pos[1]+Math.sin(a)*r];if(driverMarkers[d.id])driverMarkers[d.id].setLatLng(d.pos)});
+  CRANES.forEach(c=>{const a=Math.random()*2*Math.PI,r=.0001+Math.random()*.0002;c.pos=[c.pos[0]+Math.cos(a)*r,c.pos[1]+Math.sin(a)*r];if(craneMarkers[c.id])craneMarkers[c.id].setLatLng(c.pos)});
+  updateInfo();
+}
+
+function setCarLoc(l){carLoc=l;if(carMark)map.removeLayer(carMark);carMark=L.marker(l,{icon:carIc}).addTo(map).bindPopup('موقعك 📍');updateRoute();updateInfo();checkOk()}
+function setDestLoc(l){destLoc=l;if(destMark)map.removeLayer(destMark);destMark=L.marker(l,{icon:pinIc}).addTo(map).bindPopup('الوجهة 🏁');updateRoute();updateInfo();checkOk()}
+function updateRoute(){if(routeLine)map.removeLayer(routeLine);if(carLoc&&destLoc){routeLine=L.polyline([carLoc,destLoc],{color:'#F4A261',weight:4,dashArray:'10,6'}).addTo(map);map.fitBounds(L.latLngBounds([carLoc,destLoc]),{padding:[50,50]})}else if(carLoc)map.setView(carLoc,13)}
+function updateInfo(){
+  if(!carLoc)return;
+  const{driver:nd,dist:dd}=nearest(carLoc);
+  const et=eta(dd,nd.speed);
+  DRIVERS.forEach(d=>{if(driverMarkers[d.id])driverMarkers[d.id].setIcon(craneIc(d.id===nd.id))});
+  document.getElementById('driverInfo').style.display='flex';
+  document.getElementById('driverInfo').className='driver-card';
+  document.getElementById('driverInfo').innerHTML='<span style="font-size:1.4rem">🚛</span><div class="info"><div class="name">'+nd.name+'</div><div class="dist">يبعد '+dd.toFixed(1)+' كم • ⭐ '+nd.rating+'</div></div><div class="eta"><div class="val">'+et+' د</div><div class="lbl">وقت الوصول</div></div>';
+  if(carLoc&&destLoc){const rd=haversine(carLoc,destLoc),pr=price(rd);document.getElementById('metricsPanel').style.display='grid';document.getElementById('metricsPanel').className='metrics';document.getElementById('metricsPanel').innerHTML='<div class="metric"><div class="lbl">المسافة</div><div class="val">'+rd.toFixed(1)+' كم</div></div><div class="metric"><div class="lbl">وقت الوصول</div><div class="val" style="color:var(--accent2)">'+et+' د</div></div><div class="metric"><div class="lbl">السعر</div><div class="val" style="color:var(--green);font-size:.8rem">'+fmtPrice(pr)+'</div></div>'}
+}
+function updateHint(){let o=document.querySelector('.map-hint');if(o)o.remove();if(mode){const h=document.createElement('div');h.className='map-hint';h.textContent=mode==='car'?'انقر لتحديد موقع السيارة 📍':'انقر لتحديد الوجهة 🏁';document.getElementById('map').appendChild(h)}}
+function toggleMode(t){mode=mode===t?null:t;updateHint()}
+
+function debounce(v,t){if(timers[t])clearTimeout(timers[t]);timers[t]=setTimeout(()=>search(v,t),400)}
+async function search(q,t){
+  if(q.trim().length<2){hideDrop(t);return}
+  try{
+    const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&q='+encodeURIComponent(q+', العراق'));
+    const data=await r.json();
+    const dd=document.getElementById(t==='car'?'carDrop':'destDrop');
+    if(!data.length){hideDrop(t);return}
+    dd.innerHTML='';
+    data.forEach(x=>{const b=document.createElement('button');b.textContent='📍 '+x.display_name;b.onclick=()=>{const l=[parseFloat(x.lat),parseFloat(x.lon)];if(t==='car'){setCarLoc(l);document.getElementById('carInput').value=x.display_name.split(',').slice(0,2).join(',')}else{setDestLoc(l);document.getElementById('destInput').value=x.display_name.split(',').slice(0,2).join(',')};hideDrop(t)};dd.appendChild(b)});
+    dd.classList.add('show');
+  }catch(e){}
+}
+function showDrop(t){const d=document.getElementById(t==='car'?'carDrop':'destDrop');if(d.children.length)d.classList.add('show')}
+function hideDrop(t){document.getElementById(t==='car'?'carDrop':'destDrop').classList.remove('show')}
+document.addEventListener('click',e=>{if(!document.getElementById('carWrap').contains(e.target))hideDrop('car');if(document.getElementById('destWrap')&&!document.getElementById('destWrap').contains(e.target))hideDrop('dest')});
+
+function pickService(btn,id){
+  document.querySelectorAll('.prob-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');svc=id;
+  const dg=document.getElementById('destGroup');
+  if(id==='tow'){dg.style.display='flex';if(!document.getElementById('destInput').value)destLoc=null}
+  else{dg.style.display='none';destLoc=carLoc}
+  checkOk();
+}
+function checkOk(){const ok=svc&&document.getElementById('carTypeInput').value&&document.getElementById('phoneInput').value&&carLoc&&destLoc;document.getElementById('submitBtn').disabled=!ok}
+document.getElementById('carTypeInput').addEventListener('input',checkOk);
+document.getElementById('phoneInput').addEventListener('input',checkOk);
+
+const svcNames={tow:'نقل السيارة',repair:'تصليح بالموقع',battery:'شحن بطارية',tire:'تبديل إطارات'};
+
+function openOrder(){
+  document.getElementById('orderOverlay').classList.add('active');
+  document.body.style.overflow='hidden';
+  setTimeout(()=>initMap(),150);
+}
+function closeOrder(){
+  ['orderOverlay','confirmedOv','cancelledOv'].forEach(id=>document.getElementById(id).classList.remove('active'));
+  document.body.style.overflow='';
+  carLoc=destLoc=null;svc='';
+  if(map){map.remove();map=null;driverMarkers={};craneMarkers={};carMark=destMark=routeLine=null}
+  document.querySelectorAll('.prob-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('destGroup').style.display='none';
+  document.getElementById('driverInfo').style.display='none';
+  document.getElementById('metricsPanel').style.display='none';
+  ['carInput','destInput','carTypeInput','phoneInput'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('submitBtn').disabled=true;
+}
+
+function confirmOrder(){
+  const{driver:nd,dist:dd}=nearest(carLoc);
+  const rd=destLoc?haversine(carLoc,destLoc):0,pr=price(rd),et=eta(dd,nd.speed);
+  const carType=document.getElementById('carTypeInput').value;
+  const phone=document.getElementById('phoneInput').value;
+  const svcName=svcNames[svc]||svc;
+
+  const mapsLink = carLoc ? 'https://www.google.com/maps?q=' + carLoc[0] + ',' + carLoc[1] : '';
+  const destMapsLink = destLoc ? 'https://www.google.com/maps?q=' + destLoc[0] + ',' + destLoc[1] : '';
+  currentOrder={driver:nd,dist:dd,dist_dest:rd,price:pr,eta_val:et,carType,phone,svc,svcName,mapsLink,destMapsLink};
+
+  document.getElementById('orderOverlay').classList.remove('active');
+  document.getElementById('confirmedOv').classList.add('active');
+  document.getElementById('confirmDetail').innerHTML=
+    '<div class="row"><span class="lbl">السائق</span><span class="val">'+nd.name+'</span></div>'+
+    '<div class="row"><span class="lbl">رقم اللوحة</span><span class="val">'+nd.plate+'</span></div>'+
+    '<div class="row"><span class="lbl">هاتف السائق</span><span class="val">'+nd.phone+'</span></div>'+
+    '<div class="row"><span class="lbl">التقييم</span><span class="val">⭐ '+nd.rating+'</span></div>'+
+    '<div class="row"><span class="lbl">نوع الخدمة</span><span class="val">'+svcName+'</span></div>'+
+    '<div class="row"><span class="lbl">نوع السيارة</span><span class="val">'+carType+'</span></div>'+
+    '<hr style="border-color:rgba(255,255,255,.08);margin:6px 0">'+
+    '<div class="row"><span class="lbl">المسافة</span><span class="val">'+rd.toFixed(1)+' كم</span></div>'+
+    '<div class="row"><span class="lbl">وقت الوصول</span><span class="val" style="color:var(--accent2)">'+et+' دقيقة</span></div>'+
+    '<div class="row"><span class="lbl">السعر</span><span class="val" style="color:var(--green)">'+fmtPrice(pr)+'</span></div>';
+
+  // إرسال إشعار بريد إلكتروني
+  sendEmailNotification('🚛 طلب جديد — خدمات طوارئ السيارات',[
+    'تم استلام طلب جديد:',
+    '─────────────────',
+    'نوع الخدمة: ' + svcName,
+    'نوع السيارة: ' + carType,
+    'رقم هاتف الزبون: ' + phone,
+    '─────────────────',
+    '📍 موقع السيارة (اضغط للفتح):',
+    mapsLink,
+    (destMapsLink ? '🏁 الوجهة (اضغط للفتح):\n' + destMapsLink : ''),
+    '─────────────────',
+    'السائق المعين: ' + nd.name,
+    'هاتف السائق: ' + nd.phone,
+    'رقم اللوحة: ' + nd.plate,
+    'المسافة: ' + rd.toFixed(1) + ' كم',
+    'وقت الوصول المتوقع: ' + et + ' دقيقة',
+    'السعر: ' + fmtPrice(pr),
+    '─────────────────',
+    'الوقت: ' + new Date().toLocaleString('ar-IQ')
+  ]);
+}
+
+function openCancelModal(){document.getElementById('cancelModal').classList.add('active')}
+function closeCancelModal(){document.getElementById('cancelModal').classList.remove('active')}
+
+function submitCancel(){
+  const reason=document.getElementById('cancelReason').value.trim();
+  if(!reason){
+    document.getElementById('cancelReason').style.borderColor='var(--accent)';
+    document.getElementById('cancelReason').placeholder='يرجى كتابة سبب الإلغاء أولاً...';
+    return;
+  }
+  closeCancelModal();
+  document.getElementById('confirmedOv').classList.remove('active');
+  document.getElementById('cancelledOv').classList.add('active');
+  document.getElementById('cancelReasonShow').textContent='السبب: ' + reason;
+
+  // إرسال إشعار إلغاء
+  sendEmailNotification('❌ إلغاء طلب — خدمات طوارئ السيارات',[
+    'تم إلغاء طلب:',
+    '─────────────────',
+    'نوع الخدمة: ' + (currentOrder.svcName||''),
+    'نوع السيارة: ' + (currentOrder.carType||''),
+    'رقم هاتف الزبون: ' + (currentOrder.phone||''),
+    '─────────────────',
+    '📍 موقع السيارة (اضغط للفتح):',
+    (currentOrder.mapsLink||'غير محدد'),
+    (currentOrder.destMapsLink ? '🏁 الوجهة (اضغط للفتح):\n' + currentOrder.destMapsLink : ''),
+    '─────────────────',
+    'السائق المعين: ' + (currentOrder.driver?currentOrder.driver.name:''),
+    '─────────────────',
+    'سبب الإلغاء: ' + reason,
+    '─────────────────',
+    'الوقت: ' + new Date().toLocaleString('ar-IQ')
+  ]);
+}
+
+let selRating=0;
+function rate(n){
+  selRating=n;
+  document.querySelectorAll('#ratingStars span').forEach((s,i)=>{s.style.opacity=i<n?'1':'0.3'});
+  document.getElementById('ratingTxt').textContent='تم التقييم: '+n+' نجوم ⭐';
+}
+</script>
+</body>
+</html>
